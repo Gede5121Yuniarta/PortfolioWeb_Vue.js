@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Makanan</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="output.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-blue-500 p-4 text-white bg-opacity-75">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold text-purple-700 font-serif">DE SRI</h1>
+            <ul class="flex space-x-4">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="app" class="container mx-auto mt-20 flex">
+        <div class="w-2/3 pr-4">
+            <h1 class="text-3xl font-semibold mb-4">Selamat datang di Toko Kami</h1>
+
+            <!-- Daftar Produk -->
+            <div class="grid grid-cols-3 gap-4">
+                <div v-for="(produk, index) in daftarProduk" :key="index" class="border p-4 rounded-md bg-white">
+                    <img :src="produk.gambar" alt="Gambar {{ produk.nama }}" class="w-full h-64 object-contain mb-2">
+                    <h2 class="text-xl font-semibold">{{ produk.nama }}</h2>
+                    <p class="text-blue-500">Harga: Rp{{ produk.harga }}</p>
+                    <button @click="tambahKeKeranjang(produk)"
+                        class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Tambah ke Keranjang</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-1/3 pl-4">
+            <h2 class="text-2xl mb-4">Keranjang Belanja Anda</h2>
+
+            <!-- Keranjang Belanja -->
+            <table class="table-auto">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2">Nama Produk</th>
+                        <th class="px-4 py-2">Harga</th>
+                        <th class="px-4 py-2">Jumlah</th>
+                        <th class="px-4 py-2">Total</th>
+                        <th class="px-4 py-2">Hapus</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in keranjang" :key="index">
+                        <td class="border px-4 py-2">{{ item.nama }}</td>
+                        <td class="border px-4 py-2 text-blue-500">Rp{{ item.harga }}</td>
+                        <td class="border px-4 py-2">
+                            <button @click="kurangiProduk(index)">-</button>
+                            {{ item.jumlah }}
+                            <button @click="tambahKeKeranjang(item)">+</button>
+                        </td>
+                        <td class="border px-4 py-2 text-blue-500">Rp{{ item.total }}</td>
+                        <td class="border px-4 py-2">
+                            <button @click="hapusProduk(index)"
+                                class="bg-red-500 text-white px-4 py-1 rounded">Hapus</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="text-xl mt-4">Total Belanja: Rp{{ totalBelanja }}</p>
+
+            <!-- Opsi Pembayaran -->
+            <div class="mt-6">
+                <button @click="bayar" class="bg-blue-500 text-white px-4 py-2 rounded">Bayar</button>
+            </div>
+
+            <!-- Notifikasi Pembayaran -->
+            <div v-if="pembayaranSelesai" class="mt-4 p-2 border rounded bg-green-200 text-green-700">
+                Notifikasi: Pembayaran Selesai
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-blue-500 p-4 text-white text-center">
+        &copy; 2023 Gede Sri Yuniarta
+    </footer>
+</body>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                daftarProduk: [
+                    { nama: "Nasi Goreng a", harga: 10000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng b", harga: 15000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng c", harga: 20000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng d", harga: 25000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng f", harga: 30000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng g", harga: 35000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng h", harga: 40000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng i", harga: 45000, gambar: "gambarnasgor.jpg" },
+                    { nama: "Nasi Goreng j", harga: 50000, gambar: "gambarnasgor.jpg" },
+                ],
+                keranjang: [],
+                pembayaranSelesai: false,
+            };
+        },
+        computed: {
+            totalBelanja() {
+                return this.keranjang.reduce((total, item) => total + item.total, 0);
+            },
+        },
+        methods: {
+            tambahKeKeranjang(produk) {
+                const index = this.keranjang.findIndex(item => item.nama === produk.nama);
+                if (index !== -1) {
+                    this.keranjang[index].jumlah++;
+                    this.keranjang[index].total = this.keranjang[index].harga * this.keranjang[index].jumlah;
+                } else {
+                    this.keranjang.push({
+                        nama: produk.nama,
+                        harga: produk.harga,
+                        jumlah: 1,
+                        total: produk.harga,
+                    });
+                }
+            },
+            kurangiProduk(index) {
+                if (this.keranjang[index].jumlah > 1) {
+                    this.keranjang[index].jumlah--;
+                    this.keranjang[index].total = this.keranjang[index].harga * this.keranjang[index].jumlah;
+                }
+            },
+            hapusProduk(index) {
+                this.keranjang.splice(index, 1);
+            },
+            bayar() {
+                this.pembayaranSelesai = true;
+                this.keranjang = [];
+            },
+        },
+    }).mount('#app');
+</script>
+
+</html>

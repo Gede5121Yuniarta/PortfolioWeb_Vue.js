@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan vue js</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="output.css">
+</head>
+
+<body>
+    <main>
+        <div id="app" class="container mx-auto bg-blue-100 pt-2 pr-4 pb-2 pl-4 my-10 rounded-2xl mt-10">
+            <div class="border border-white m-4 p-4 rounded-2xl mb-4">
+                <div class="card mb-4">
+                    <form @submit.prevent="tambahBarang">
+                        <div class="mb-4">
+                            <label for="namaBarang" class="block font-medium">Nama:</label>
+                            <input type="text" id="namaBarang" v-model="namaBarang" required
+                                class="border rounded py-1 px-2 w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label for="jumlahBarang" class="block font-medium">Jumlah:</label>
+                            <input type="text" id="jumlahBarang" v-model="jumlahBarang" required
+                                class="border rounded py-1 px-2 w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label for="hargaBarang" class="block font-medium">Harga:</label>
+                            <input type="text" id="hargaBarang" v-model="hargaBarang" required
+                                class="border rounded py-1 px-2 w-full">
+                        </div>
+                        <div class="mb-4">
+                            <label for="tipeBarang" class="block font-medium">Tipe:</label>
+                            <select id="tipeBarang" v-model="tipeBarang" required
+                                class="border rounded py-1 px-2 w-full">
+                                <option v-for="option in tipeOptions" :value="option">{{ option }}</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Tambah</button>
+                    </form>
+                </div>
+            </div>
+            <div class="border border-white m-4 p-4">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border border-white rounded-md">
+                            <th class="border border-white">Nama</th>
+                            <th class="border border-white">Jumlah</th>
+                            <th class="border border-white">Harga</th>
+                            <th class="border border-white">Tipe</th>
+                            <th class="border border-white">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border border-white" v-for="(barang, index) in daftarBarang" :key="index">
+                            <td class="border border-white">{{ barang.nama }}</td>
+                            <td class="border border-white">{{ barang.jumlah }}</td>
+                            <td class="border border-white">{{ barang.harga }}</td>
+                            <td class="border border-white">{{ barang.tipe }}</td>
+                            <td class="border border-white">{{ barang.total }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <!-- Script Vue.js dan metodenya -->
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    namaBarang: '',
+                    jumlahBarang: '',
+                    hargaBarang: '',
+                    tipeBarang: 'Makanan',
+                    daftarBarang: [],
+                    tipeOptions: ['Makanan', 'Minuman']
+                };
+            },
+            methods: {
+                tambahBarang() {
+                    const total = parseFloat(this.jumlahBarang) * parseFloat(this.hargaBarang);
+                    this.daftarBarang.push({
+                        nama: this.namaBarang,
+                        jumlah: this.jumlahBarang,
+                        harga: this.hargaBarang,
+                        tipe: this.tipeBarang,
+                        total: total.toFixed(2)
+                    });
+                    this.resetForm();
+                },
+                resetForm() {
+                    this.namaBarang = '';
+                    this.jumlahBarang = '';
+                    this.hargaBarang = '';
+                    this.tipeBarang = 'Makanan';
+                }
+            }
+        }).mount('#app'); // .mount('#app') menghubungkan aplikasi Vue dengan elemen yang memiliki id "app"
+    </script>
+</body>
+
+</html>
